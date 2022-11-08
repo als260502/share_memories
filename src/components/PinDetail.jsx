@@ -13,6 +13,7 @@ import { pinDetailMorePinQuery, pinDetailQuery } from "../utils/data";
 import { Spinner } from "./Spinner";
 
 import { useTranslation } from "react-i18next";
+import { useCallback } from "react";
 
 export const PinDetail = ({ user }) => {
   const [pins, setPins] = useState(null);
@@ -24,7 +25,7 @@ export const PinDetail = ({ user }) => {
 
   const { t } = useTranslation();
 
-  const fetchPinDetails = () => {
+  const fetchPinDetails = useCallback(() => {
     let query = pinDetailQuery(pinId);
 
     if (query) {
@@ -37,13 +38,13 @@ export const PinDetail = ({ user }) => {
         }
       });
     }
-  };
+  }, [pinId]);
 
   useEffect(() => {
     fetchPinDetails();
-  }, [pinId]);
+  }, [fetchPinDetails]);
 
-  const addComment = () => {
+  const addComment = useCallback(() => {
     if (comment) {
       setAddingComment(true);
 
@@ -67,7 +68,7 @@ export const PinDetail = ({ user }) => {
           setAddingComment(false);
         });
     }
-  };
+  }, [comment, pinId, fetchPinDetails]);
 
   if (!pinDetail) return <Spinner message={t("LoadingMessage.text")} />;
   return (
