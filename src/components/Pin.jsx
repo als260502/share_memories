@@ -117,7 +117,7 @@ export const Pin = ({ pin: { postedBy, image, _id, destination, save } }) => {
                     : destination}
                 </a>
               )}
-              {postedBy?._id === user.sub && (
+              {postedBy?._id === user._id && (
                 <button
                   onClick={(e) => handleDeletePin(e, _id)}
                   type="button"
