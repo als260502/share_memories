@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { MdDownloadForOffline } from "react-icons/md";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams, useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 
 import { client, urlFor } from "../lib/sanityClient";
@@ -14,12 +14,16 @@ import { Spinner } from "./Spinner";
 
 import { useTranslation } from "react-i18next";
 import { useCallback } from "react";
+import { useAuthStore } from "../store/authStore";
+import { AiTwotoneDelete } from "react-icons/ai";
 
 export const PinDetail = ({ user }) => {
   const [pins, setPins] = useState(null);
   const [pinDetail, setPinDetail] = useState(null);
   const [comment, setComment] = useState("");
   const [addingComment, setAddingComment] = useState(false);
+
+  const navigate = useNavigate();
 
   const { pinId } = useParams();
 
@@ -70,6 +74,14 @@ export const PinDetail = ({ user }) => {
     }
   }, [comment, pinId, fetchPinDetails]);
 
+  const handleDeletePin = (e, id) => {
+    e.stopPropagation();
+    client.delete(id).then(() => {
+      navigate("/", { replace: true });
+      window.location.reload();
+    });
+  };
+
   if (!pinDetail) return <Spinner message={t("LoadingMessage.text")} />;
   return (
     <>
@@ -100,6 +112,16 @@ export const PinDetail = ({ user }) => {
           </div>
           <div>
             <div>
+              {pinDetail.postedBy?._id === user._id && (
+                <button
+                  onClick={(e) => handleDeletePin(e, pinId)}
+                  type="button"
+                  className="flex lg:hidden items-center gap-2 bg-white p-2 opacity-50 hover:opacity-100 text-dark font-bold text-base rounded-3xl hover:shadow-md outline-none "
+                >
+                  <AiTwotoneDelete />
+                  Remove memory
+                </button>
+              )}
               <h1 className="text-4xl font-bold break-words mt-3">
                 {pinDetail.title}
               </h1>
